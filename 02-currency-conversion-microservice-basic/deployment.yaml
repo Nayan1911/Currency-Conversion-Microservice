@@ -1,0 +1,44 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app: currency-conversion
+  name: currency-conversion
+  namespace: default
+spec:
+  containers:
+  - image: in28min/currency-conversion:0.0.1-RELEASE
+    imagePullPolicy: IfNotPresent
+    name: currency-conversion
+    env:
+      - name: CURRENCY_EXCHANGE_SERVICE_HOST
+        valueFrom:
+          configMapKeyRef:
+            key: CURRENCY_EXCHANGE_SERVICE_HOST
+            name: currency-conversion-config-map
+    resources:
+      limits:
+        cpu: "1"
+        memory: "512Mi"
+      requests:
+        cpu: "0.1"
+        memory: "64Mi"
+  restartPolicy: Always
+  terminationGracePeriodSeconds: 30
+---
+apiVersion: v1
+kind: Service
+metadata:
+  labels: #PODS
+    app: currency-conversion
+  name: currency-conversion
+  namespace: default
+spec:
+  ports:
+  - port: 8100 #CHANGE
+    protocol: TCP
+    targetPort: 8100 #CHANGE
+  selector:
+    app: currency-conversion
+  sessionAffinity: None #CHANGE
+  type: NodePort 
