@@ -6,6 +6,13 @@ on:
   pull_request:
     branches: [ "main" ]
 
+env:
+  PROJECT_ID: ${{ secrets.GKE_PROJECT }}
+  GKE_CLUSTER: cluster1    # TODO: update to cluster name
+  GKE_ZONE: us-central1
+  GOOGLE_APPLICATION_CREDENTIAL: ${{ secrets.SA_KEY }}
+  
+
 jobs:
   build:
 
@@ -22,4 +29,49 @@ jobs:
     - name: Build with Maven
       run: mvn -B package --file pom.xml
 
+    - name: Build and push Docker image
+      run: |
+        echo "Qwerty@12345" | docker login -u sharmanayan --password-stdin 
+        docker build -t ${{ env.IMAGE_NAME }} .
+        docker push ${{ env.IMAGE_NAME }}
 
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+  
+      - name: Set up Terraform
+        uses: hashicorp/setup-terraform@v1
+        with:
+          terraform_version: 1.0.0
+  
+      - name: Configure Google Cloud credentials
+        uses: google-github-actions/setup-gcloud@v1
+  
+      - name: Authenticate gcloud
+        uses: google-github-actions/auth@v0
+        with:
+          credentials_json: ${{ secrets.SA_KEY }}
+
+      - name: Debug Credentials
+        run: |
+          echo "GOOGLE_APPLICATION_CREDENTIALS: $GOOGLE_APPLICATION_CREDENTIALS"
+          gcloud auth list
+  
+      - name: Initialize Terraform for Currency Exchange service
+        run:
+          terraform init -chdir 01-currency-exchange-microservice-basic\Configuration
+          terraform init -chdir 02-currency-conversion-microservice-basic\Configuration
+  
+      - name: Terraform Plan for Currency Exchange service
+        run:
+          terraform plan -chdir 01-currency-exchange-microservice-basic\Configuration
+          terraform plan -chdir 02-currency-conversion-microservice-basic\Configuration
+  
+      - name: Terraform Apply for Currency Exchange service
+        run:
+          terraform apply -auto-approve -chdir 01-currency-exchange-microservice-basic\Configuration
+          terraform apply -auto-approve -chdir 02-currency-conversion-microservice-basic\Configuration
+        
