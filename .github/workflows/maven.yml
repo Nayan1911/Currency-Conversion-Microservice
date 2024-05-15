@@ -14,51 +14,51 @@ env:
   
 
 jobs:
-  # build:
-  #   runs-on: ubuntu-latest
-  #   steps:
-  #   - uses: actions/checkout@v4
-  #   - name: Set up JDK 17
-  #     uses: actions/setup-java@v3
-  #     with:
-  #       java-version: '17'
-  #       distribution: 'temurin'
-  #       cache: maven
-  #   - name: Build Currency Exchange Microservice
-  #     run: mvn -B package --file ./01-currency-exchange-microservice-basic/pom.xml
-  #   - name: Build Currency Conversion Microservice
-  #     run: mvn -B package --file ./02-currency-conversion-microservice-basic/pom.xml
+  build:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v4
+    - name: Set up JDK 17
+      uses: actions/setup-java@v3
+      with:
+        java-version: '17'
+        distribution: 'temurin'
+        cache: maven
+    - name: Build Currency Exchange Microservice
+      run: mvn -B package --file ./01-currency-exchange-microservice-basic/pom.xml
+    - name: Build Currency Conversion Microservice
+      run: mvn -B package --file ./02-currency-conversion-microservice-basic/pom.xml
 
-  # Docker_Deploy_conversion:
-  #   needs: build
-  #   runs-on: ubuntu-latest
-  #   steps:
-  #   - uses: actions/checkout@v4
-  #   - name: Build currency conversion service Docker image
-  #     run: docker build -t sharmanayan/currency-conversion:0.0.1-RELEASE ./01-currency-exchange-microservice-basic
+  Docker_Deploy_conversion:
+    needs: build
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v4
+    - name: Build currency conversion service Docker image
+      run: docker build -t sharmanayan/currency-conversion:0.0.1-RELEASE ./01-currency-exchange-microservice-basic
 
-  #   - name: Login to Docker registry
-  #     run: echo ${{ secrets.DOCKER_PASSWORD }} | docker login -u sharmanayan --password-stdin
+    - name: Login to Docker registry
+      run: echo ${{ secrets.DOCKER_PASSWORD }} | docker login -u sharmanayan --password-stdin
 
-  #   - name: Push currency conversion service Docker image to registry
-  #     run: docker push sharmanayan/currency-conversion:0.0.1-RELEASE
+    - name: Push currency conversion service Docker image to registry
+      run: docker push sharmanayan/currency-conversion:0.0.1-RELEASE
 
-  # Docker_Deploy_Exchange:
-  #   needs: build
-  #   runs-on: ubuntu-latest
-  #   steps:
-  #   - uses: actions/checkout@v4
-  #   - name: Build exchange service Docker image
-  #     run: docker build -t sharmanayan/currency-exchange:0.0.1-RELEASE ./02-currency-conversion-microservice-basic
+  Docker_Deploy_Exchange:
+    needs: build
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v4
+    - name: Build exchange service Docker image
+      run: docker build -t sharmanayan/currency-exchange:0.0.1-RELEASE ./02-currency-conversion-microservice-basic
 
-  #   - name: Login to Docker registry
-  #     run: echo ${{ secrets.DOCKER_PASSWORD }} | docker login -u sharmanayan --password-stdin
+    - name: Login to Docker registry
+      run: echo ${{ secrets.DOCKER_PASSWORD }} | docker login -u sharmanayan --password-stdin
 
-  #   - name: Push exchange service Docker image to registry
-  #     run: docker push sharmanayan/currency-exchange:0.0.1-RELEASE
+    - name: Push exchange service Docker image to registry
+      run: docker push sharmanayan/currency-exchange:0.0.1-RELEASE
 
   deploy_Exchange:
-    # needs: Docker_Deploy_Exchange
+    needs: Docker_Deploy_Exchange
     runs-on: ubuntu-latest
     defaults:
       run:
