@@ -28,7 +28,7 @@ resource "kubernetes_deployment" "currency_conversion_deployment" {
       }
 
       spec {
-        containers {
+        container {
           name  = "currency-conversion"
           image = "sharmanayan/currency-conversion:0.0.1-RELEASE"
 
