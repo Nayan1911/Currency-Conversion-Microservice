@@ -126,7 +126,7 @@ jobs:
         gcloud auth list
 
     - name: Terraform Plan for Currency Conversion service
-      run: terraform plan -chdir
+      run: terraform plan
 
     - name: Terraform Apply for Currency Conversion service
       run: terraform apply -auto-approve -chdir
