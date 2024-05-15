@@ -95,7 +95,7 @@ jobs:
       run: terraform apply -auto-approve
         
   deploy_Conversion:
-    # needs: Docker_Deploy_Exchange
+    needs: deploy_Exchange
     runs-on: ubuntu-latest
     defaults:
       run:
@@ -129,4 +129,4 @@ jobs:
       run: terraform plan
 
     - name: Terraform Apply for Currency Conversion service
-      run: terraform apply -auto-approve -chdir
+      run: terraform apply -auto-approve
