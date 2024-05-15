@@ -15,9 +15,7 @@ env:
 
 jobs:
   build:
-
     runs-on: ubuntu-latest
-
     steps:
     - uses: actions/checkout@v4
     - name: Set up JDK 17
@@ -27,21 +25,43 @@ jobs:
         distribution: 'temurin'
         cache: maven
     - name: Build with Maven
-      run: mvn -B package --file pom.xml
+      run:
+        mvn -B package --file ./01-currency-exchange-microservice-basic/pom.xml
+        mvn -B package --file ./02-currency-conversion-microservice-basic/pom.xml
 
-    - name: Build and push Docker image
-      run: |
-        echo "Qwerty@12345" | docker login -u sharmanayan --password-stdin 
-        docker build -t ${{ env.IMAGE_NAME }} .
-        docker push ${{ env.IMAGE_NAME }}
+  Docker_Deploy_conversion:
+    needs: build
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Build currency conversion service Docker image
+        run: docker build -t sharmanayan/currency-conversion:0.0.1-RELEASE ./01-currency-exchange-microservice-basic
+
+      - name: Login to Docker registry
+        run: echo ${{ secrets.DOCKER_PASSWORD }} | docker login -u sharmanayan --password-stdin
+
+      - name: Push currency conversion service Docker image to registry
+        run: docker push sharmanayan/currency-conversion:0.0.1-RELEASE
+
+  Docker_Deploy_Exchange:
+    needs: build
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Build exchange service Docker image
+        run: docker build -t sharmanayan/currency-exchange:0.0.1-RELEASE ./02-currency-conversion-microservice-basic
+
+      - name: Login to Docker registry
+        run: echo ${{ secrets.DOCKER_PASSWORD }} | docker login -u sharmanayan --password-stdin
+
+      - name: Push exchange service Docker image to registry
+        run: docker push sharmanayan/currency-exchange:0.0.1-RELEASE
 
   deploy:
     needs: build
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v2
-  
+      - uses: actions/checkout@v4
       - name: Set up Terraform
         uses: hashicorp/setup-terraform@v1
         with:
@@ -62,16 +82,16 @@ jobs:
   
       - name: Initialize Terraform for Currency Exchange service
         run:
-          terraform init -chdir 01-currency-exchange-microservice-basic\Configuration
-          terraform init -chdir 02-currency-conversion-microservice-basic\Configuration
+          terraform init -chdir ./01-currency-exchange-microservice-basic/Configuration
+          terraform init -chdir ./02-currency-conversion-microservice-basic/Configuration
   
       - name: Terraform Plan for Currency Exchange service
         run:
-          terraform plan -chdir 01-currency-exchange-microservice-basic\Configuration
-          terraform plan -chdir 02-currency-conversion-microservice-basic\Configuration
+          terraform plan -chdir ./01-currency-exchange-microservice-basic/Configuration
+          terraform plan -chdir ./02-currency-conversion-microservice-basic/Configuration
   
       - name: Terraform Apply for Currency Exchange service
         run:
-          terraform apply -auto-approve -chdir 01-currency-exchange-microservice-basic\Configuration
-          terraform apply -auto-approve -chdir 02-currency-conversion-microservice-basic\Configuration
+          terraform apply -auto-approve -chdir ./01-currency-exchange-microservice-basic/Configuration
+          terraform apply -auto-approve -chdir ./02-currency-conversion-microservice-basic/Configuration
         
