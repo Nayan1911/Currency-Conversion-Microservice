@@ -87,6 +87,12 @@ jobs:
         echo "GOOGLE_APPLICATION_CREDENTIALS: $GOOGLE_APPLICATION_CREDENTIALS"
         gcloud auth list
 
+    - name: Terraform Format
+      run: terraform fmt
+
+    - name: Terraform validate
+      run: terraform validate
+
     - name: Terraform Plan for Currency Exchange service
       run: terraform plan
 
