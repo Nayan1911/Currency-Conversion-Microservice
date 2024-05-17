@@ -8,7 +8,7 @@ resource "google_container_cluster" "cluster" {
   location = var.zone
 
   initial_node_count = 1  # Replaces min_count
-  node_pool_default {  # Replaces node_pool block
+  node_pool_defaults {  # Replaces node_pool block
     machine_type = "n1-standard-1"
     disk_size_gb  = 100
     disk_type    = "pd-standard"
