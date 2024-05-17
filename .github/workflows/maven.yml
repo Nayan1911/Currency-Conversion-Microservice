@@ -12,7 +12,6 @@ env:
   GKE_ZONE: us-central1
   GOOGLE_APPLICATION_CREDENTIAL: ${{ secrets.SA_KEY }}
   
-
 jobs:
   build:
     runs-on: ubuntu-latest
