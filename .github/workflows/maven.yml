@@ -57,7 +57,7 @@ jobs:
   #     run: docker push sharmanayan/currency-exchange:0.0.1-RELEASE
 
   deploy_Exchange:
-    # needs: Docker_Deploy_Exchange
+    needs: build
     runs-on: ubuntu-latest
     defaults:
       run:
