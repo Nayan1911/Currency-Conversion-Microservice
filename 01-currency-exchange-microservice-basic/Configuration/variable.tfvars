@@ -1,15 +1,4 @@
-variable "project_id" {
-  description = "glowing-palace-414116"
-}
-
-variable "region" {
-  description = "us-central1"
-}
-
-variable "zone" {
-  description = "us-central1-c"
-}
-
-variable "cluster_name" {
-  description = "cluster1"
-}
+project_id = "glowing-palace-414116"
+region = "us-central1"
+zone = "us-central1-c"
+cluster_name = "cluster1"
