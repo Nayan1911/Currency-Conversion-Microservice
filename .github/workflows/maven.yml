@@ -97,7 +97,7 @@ jobs:
       run: terraform plan -input=false -lock=false -no-color -var-file="variable.tfvars"
 
     - name: Terraform Apply for Currency Exchange service
-      run: terraform apply -auto-approve
+      run: terraform apply -auto-approve -var-file="variable.tfvars"
         
   deploy_Conversion:
     needs: deploy_Exchange
