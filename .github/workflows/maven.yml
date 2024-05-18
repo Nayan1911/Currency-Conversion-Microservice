@@ -94,7 +94,7 @@ jobs:
       run: terraform validate
 
     - name: Terraform Plan for Currency Exchange service
-      run: terraform plan -input=false -lock=false -no-color -var-file="variable.tf"
+      run: terraform plan -input=false -lock=false -no-color -var-file="variable.tfvars"
 
     - name: Terraform Apply for Currency Exchange service
       run: terraform apply -auto-approve
