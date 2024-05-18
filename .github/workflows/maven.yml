@@ -94,7 +94,7 @@ jobs:
       run: terraform validate
 
     - name: Terraform Plan for Currency Exchange service
-      run: terraform plan
+      run: terraform plan -input=false -lock=false -no-color
 
     - name: Terraform Apply for Currency Exchange service
       run: terraform apply -auto-approve
